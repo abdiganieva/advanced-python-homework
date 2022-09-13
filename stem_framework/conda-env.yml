@@ -1,0 +1,7 @@
+name: stem-framework-dev
+channels:
+  - defaults
+dependencies:
+  - sphinx
+  - pylint
+  - mypy
