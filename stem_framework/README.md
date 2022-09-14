@@ -16,3 +16,17 @@ To activate this environment, use
 conda activate stem-framework-dev
 ```
 
+Install this project in editable mode 
+```
+cd ./stem_framework
+pip install -e .
+```
+## Building docs
+
+Building docs is managed via Sphinx
+```
+cd ./docs
+make html
+```
+Sphinx will build HTML files.
+
