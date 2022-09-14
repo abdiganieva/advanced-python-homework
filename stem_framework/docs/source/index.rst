@@ -1,10 +1,5 @@
-.. stem-framework documentation master file, created by
-   sphinx-quickstart on Wed Sep 14 03:29:37 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to stem-framework's documentation!
-==========================================
+Welcome to stem's documentation!
+================================
 
 .. toctree::
    :maxdepth: 2
@@ -18,3 +13,21 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Stem framework contains following modules:
+
+stem.core
+---------
+.. automodule:: stem.core
+
+stem.meta
+---------
+.. automodule:: stem.meta
+
+stem.task
+---------
+.. automodule:: stem.task
+
+stem.workspace
+--------------
+.. automodule:: stem.workspace
