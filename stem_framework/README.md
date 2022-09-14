@@ -30,3 +30,7 @@ make html
 ```
 Sphinx will build HTML files.
 
+Alternatively it's allowed to build documentation using
+```
+python setup.py build_sphinx
+```
