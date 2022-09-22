@@ -4,7 +4,7 @@ DataForge introduces the principle of metadata processor, id est during data pro
 """
 from dataclasses import dataclass, is_dataclass
 from typing import Optional, Any, Union, Type, Tuple
-from stem.core import Dataclass
+from core import Dataclass
 
 Meta = Union[dict, Dataclass]
 
@@ -20,8 +20,8 @@ class SpecificationError(Exception):
 @dataclass
 class MetaFieldError:
     required_key: str
-    required_types: Optional[tuple[type]] = None
-    presented_type: Optional[type] = None
+    required_types: Optional[Tuple[Type]] = None
+    presented_type: Optional[Type] = None
     presented_value: Any = None
 
 
