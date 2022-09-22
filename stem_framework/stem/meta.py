@@ -56,7 +56,48 @@ class MetaVerification:
 
         errs = []
 
+        for key in spec_keys:
+            #to dataclass and tuple (now dict) vars we address differently
+            if is_dataclass(specification):
+                target_types = specification.__dataclass_fields__[key].type
+            else:
+                target_types = specification[key]
 
+            if key not in meta_keys:
+                errs.append(
+                    MetaFieldError(
+                        target_key = key,
+                        target_types = target_types
+                    )
+                )
+            else:
+                master_value = get_meta_attr(meta, key)
+                master_type = type(top_value)
+                #we need to verify on any nesting level
+                if (isinstance(target_types, type) or (
+                    isinstance(target_types, tuple) and isinstance(target_types[0], type)
+                )):
+                #no recursion, no nesting levels
+                    if not issubclass(master_type, target_types):
+                        errors.append(
+                            MetaFieldError(
+                                target_key = target_key,
+                                target_types = target_types,
+                                master_value = master_value,
+                                master_type = master_type
+                            )
+                        )
+                else:
+                    #entering recursion, subclasses detected
+                    sub_errs = MetaVerification.verify(
+                        get_meta_attr(meta, target_key),
+                        target_types
+                    ).error
+
+                    if sub_errs != ():
+                        errors.append(sub_errs)
+
+        return MetaVerification(*errors)
 
 
 
