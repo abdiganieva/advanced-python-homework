@@ -70,12 +70,29 @@ class FunctionDataTask(DataTask[T]):
 
 
 def data(func: Callable[[Meta], T], specification: Optional[Specification] = None, **settings) -> FunctionDataTask[T]:
-    return FunctionDataTask(func.__name__, func, specification, **settings)
+
+    
+    def inner(name):
+        return FunctionDataTask(name, func, specification, **settings)
+        
+    if func is None:
+        inner
+    else:
+        return FunctionDataTask(func.__name__, func, specification, **settings)
 
 
 
 def task(func: Callable[..., T], specification: Optional[Specification] = None, **settings) -> FunctionTask[T]:
-    return FunctionTask(func.__name__, func, tuple(arg for arg in func.__code__.co_varnames if arg != 'meta'), specification, **settings)
+    
+    def inner(name, dependencies):
+        return FunctionDataTask(name, func, dependencies, specification, **settings)
+    
+    nometa = tuple(arg for arg in func.__code__.co_varnames if arg != 'meta')
+        
+    if func is None:
+        inner
+    else:
+        return FunctionTask(func.__name__, func, nometa, specification, **settings)
     
 
 
@@ -108,7 +125,7 @@ class FilterTask(Task[Iterator[T]]):
         self._name = 'filter_' + self.dependence_name
         
     def transform(self, meta: Meta, /, **kwargs: Any) -> T:
-        return filter(self.key, *(kwargs.values())) 
+        return filter(self.key, kwargs[self.dependence_name])
 
 class ReduceTask(Task[Iterator[T]]):
     def __init__(self, func: Callable, dependence: Union[str, "Task"]):
@@ -124,4 +141,4 @@ class ReduceTask(Task[Iterator[T]]):
         
     
     def transform(self, meta: Meta, /, **kwargs: Any) -> T:
-        return reduce(self.func, *(kwargs.values())) 
+        return reduce(self.func, kwargs[self.dependence_name])
