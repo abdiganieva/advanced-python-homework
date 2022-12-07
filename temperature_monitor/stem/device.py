@@ -16,7 +16,11 @@ class Thermometer(ABC):
     def get(self) -> float:
         pass
 
-    # TODO(Assignment 12)
+    def __enter__(self):
+        self.open()
+        
+    def __exit__(self):
+        self.close()
 
 
 class VirtualThermometer(Thermometer):
