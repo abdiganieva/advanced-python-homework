@@ -3,12 +3,12 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Union
-from PySide2.Qt import Qt
-from PySide2.QtCore import QSettings, QSize, QPoint
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QApplication, QPushButton, QDockWidget, QTextEdit
-from appdirs import user_config_dir
+from PyQt5.Qt import Qt
+from PyQt5.QtCore import QSettings, QSize, QPoint
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QApplication, QPushButton, QDockWidget, QTextEdit
+#from appdirs import user_config_dir
 from dataclasses import dataclass, field
-from .config import resolve_config
+# from .config import resolve_config
 from .controller import ControllerConfig, ThermometerController
 from .database import SqliteConfig, Database
 from .device import VirtualThermometer, USBThermometer
@@ -47,13 +47,6 @@ class RunButton(QPushButton):
         color = "green" if self.run else "red"
         self.setStyleSheet(f"QPushButton {{ background-color: {color}; }}")
 
-    
-
-class Central(QWidget):
-    def __init__(self, parent, controller : ThermometerController, database: Database, config: Config):
-        super().__init__(parent)
-        button = RunButton(self, controller)
-
 
 class QTextEditLogger(logging.Handler):
     def __init__(self, parent):
@@ -70,8 +63,9 @@ class Main(QMainWindow):
 
     def __init__(self, controller: ThermometerController, database: Database, config: Config):
         super().__init__()
-        central = Central(self, controller, None, config)
-        self.setCentralWidget(central)
+        osc = Oscilloscope()
+        self.setCentralWidget(osc)
+        button = RunButton(osc, controller)
         self.setWindowTitle("Serious TEmperature Monitor")
         # Default settings on first run
         self.settings = QSettings('SPC-NPM', 'stem')
@@ -85,6 +79,7 @@ class Main(QMainWindow):
         toolbar = self.addToolBar('Log')
         toolbar.addAction(dock.toggleViewAction())
 
+    #def 
 
     def closeEvent(self, e):
         # Save win geometry

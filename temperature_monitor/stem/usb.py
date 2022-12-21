@@ -28,9 +28,12 @@ RODOS5_6_MAXIM_CRC8_TABLE = [
 
 class USBT:
     USB_T_RX_TX_BUF_SIZE = 9
+    USB_BUFI = [0 for i in range(USB_T_RX_TX_BUF_SIZE)]  # буфер приёма
+    USB_BUFO = [0 for i in range(USB_T_RX_TX_BUF_SIZE)] # буфер передачи 
 
     def __init__(self, hid: hid.Device):
         self.hid = hid
+        
 
     def set_feature(self, data):
         try:
@@ -39,32 +42,77 @@ class USBT:
             return False
         return True
 
+    # очистка буферов приёма и передачи
+    def USB_BUF_CLEAR():
+        for i in range(USBT.USB_T_RX_TX_BUF_SIZE):
+            USB_BUFI[i]=0
+            USB_BUFO[i]=0
+
     def get_feature(self, report_id=0):
         return self.hid.get_feature_report(report_id, USBT.USB_T_RX_TX_BUF_SIZE)
 
     def get_id(self) -> Optional[int]:
-        # TODO(Assignment 15)
-        ...
+        return self.hid.idProduct
 
 
 class OneWire(USBT):
-
+            
     def reset(self) -> bool:
-        # TODO(Assignment 15: RESET Command)
-        ...
+        USB_BUF_CLEAR()
+        USB_BUFO[1]=0x18
+        USB_BUFO[2]=0x48
+        
+        for (TryCount in range(3,0,-1)):
+            if (self.set_feature()):
+                time.sleep(10/1000000.0)
+                if (self.get_feature and USB_BUFI[1]==0x18 and USB_BUFI[2]==0x48 and USB_BUFI[3]==0x00):
+                    return True
+                    
+        return False
 
     def write_bit(self, bit) -> bool:
-        # TODO(Assignment 15: Write one bit)
-        ...
-
+        USB_BUF_CLEAR()
+        USB_BUFO[1] = 0x18
+        USB_BUFO[2] = 0x81
+        USB_BUFO[3] = bit & 0x01
+        if (self.set_feature()):
+            time.sleep(5/1000000.0)
+            if ( USB_GET_FEATURE() and (USB_BUFI[1]==0x18) and (USB_BUFI[2]==0x81) and ((USB_BUFI[3]&0x01)==(bit&0x01)) ):
+                return True
+        
+        return False
+        
     def write_byte(self, byte) -> bool:
-        # TODO(Assignment 15: Write one byte)
-        ...
+        
+        USB_BUF_CLEAR()
+        USB_BUFO[1] = 0x18
+        USB_BUFO[2] = 0x88
+        USB_BUFO[3] = byte
+        if (self.set_feature()):
+            time.sleep(5/1000000.0)
+            if ( USB_GET_FEATURE() and (USB_BUFI[1]==0x18) and (USB_BUFI[2]==0x88) and (USB_BUFI[3]==byte) ):
+                return True
+        
+        return False
 
     def write_4_byte(self, data) -> bool:
-        # TODO(Assignment 15: Write four bytes)
-        ...
-
+        D0 = data
+        D1 = data >> 8
+        D2 = data >> 16
+        D3 = data >> 24
+        USB_BUF_CLEAR()
+        USB_BUFO[1] =0x18
+        USB_BUFO[2] =0x84
+        USB_BUFO[3] = D0
+        USB_BUFO[4] = D1
+        USB_BUFO[5] = D2
+        USB_BUFO[6] = D3
+        if (self.set_feature()):
+            time.sleep(30/1000000.0)
+            if (USB_GET_FEATURE() and (USB_BUFI[1]==0x18) and (USB_BUFI[2]==0x84) and (USB_BUFI[3]==D0) and (USB_BUFI[4]==D1) and (USB_BUFI[5]==D2) and (USB_BUFI[6]==D3)	):
+                return True
+        return False
+            
     def read_2_bit(self) -> Optional[int]:
         # TODO(Assignment 15: Read two bits, return integer value for which first and second bits equals reading bits)
         ...
